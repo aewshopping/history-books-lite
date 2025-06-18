@@ -30,10 +30,17 @@ jobs:
         sudo apt-get update && sudo apt-get install -y jq
         jq --version
 
+    - name: List files to debug
+      run: |
+        pwd # Print current working directory (should be repo root)
+        ls -F # List all files and directories in current dir
+        ls -F .github # List contents of .github to ensure it's correct
+        find . -name "config.json" # Search explicitly for the file
+
     - name: Process each file from config
       run: |
         set -eo pipefail
-        CONFIG_FILE="/config.json"
+        CONFIG_FILE="config.json"
         if [ ! -f "$CONFIG_FILE" ]; then
           echo "Error: Configuration file '$CONFIG_FILE' not found."
           exit 1
