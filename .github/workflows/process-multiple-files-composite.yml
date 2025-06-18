@@ -76,7 +76,7 @@ jobs:
           echo "Processing $TEMP_INPUT_FILE with Miller..."
           if [ -n "${COLUMNS_TO_DELETE}" ]; then
             echo "mlr ${MILLER_FORMAT_FLAGS} cut --exclude --fields ${COLUMNS_TO_DELETE} $TEMP_INPUT_FILE > ${OUTPUT_FILENAME}"
-            mlr ${MILLER_FORMAT_FLAGS} cut --exclude --fields "${COLUMNS_TO_DELETE}2 "$TEMP_INPUT_FILE" > "${OUTPUT_FILENAME}" 2>&1 | tee miller_output.log
+            mlr ${MILLER_FORMAT_FLAGS} cut --exclude --fields "${COLUMNS_TO_DELETE}" "$TEMP_INPUT_FILE" > "${OUTPUT_FILENAME}" 2>&1 | tee miller_output.log
           else
             echo "No columns specified for deletion. Copying original to output."
             cp "$TEMP_INPUT_FILE" "${OUTPUT_FILENAME}"
