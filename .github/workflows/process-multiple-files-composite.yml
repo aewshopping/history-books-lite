@@ -72,16 +72,14 @@ jobs:
           echo "Downloaded $TEMP_INPUT_FILE head:"
           head "$TEMP_INPUT_FILE"
 
-    - name: Debug Miller Command
-      run: |
-        set -x # Enable shell debugging (optional but helpful)
-    
-        mlr <span class="math-inline">\{MILLER\_FORMAT\_FLAGS\} cut \-\-exclude \-\-fields "</span>{COLUMNS_TO_DELETE}" "<span class="math-inline">TEMP\_INPUT\_FILE" \> "</span>{OUTPUT_FILENAME}" 2>&1 | tee miller_output.log
-      env:
-        MILLER_FORMAT_FLAGS: "--csv" # Or whatever you're using
-        COLUMNS_TO_DELETE: "your_test_column"
-        TEMP_INPUT_FILE: "your_input_file.csv"
-        OUTPUT_FILENAME: "your_output_file.csv"
+          run: |
+            set -x # Enable shell debugging (optional but helpful)          
+            mlr <span class="math-inline">\{MILLER\_FORMAT\_FLAGS\} cut \-\-exclude \-\-fields "</span>{COLUMNS_TO_DELETE}" "<span class="math-inline">TEMP\_INPUT\_FILE" \> "</span>{OUTPUT_FILENAME}" 2>&1 | tee miller_output.log
+          env:
+            MILLER_FORMAT_FLAGS: "--csv" # Or whatever you're using
+            COLUMNS_TO_DELETE: "your_test_column"
+            TEMP_INPUT_FILE: "your_input_file.csv"
+            OUTPUT_FILENAME: "your_output_file.csv"
 
           # 2. Delete unwanted columns using Miller
           echo "Processing $TEMP_INPUT_FILE with Miller..."
