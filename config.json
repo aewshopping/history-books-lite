@@ -1,0 +1,32 @@
+[
+  {
+    "url": "https://raw.githubusercontent.com/aewshopping/history_books/refs/heads/main/data_csv/books-tags.csv",
+    "output_filename": "books-tags.csv",
+    "columns_to_delete": ["tag"],
+    "miller_format": "--csv"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/aewshopping/history_books/refs/heads/main/data_csv/cats.csv",
+    "output_filename": "cats.csv",
+    "columns_to_delete": ["cat_display_type"],
+    "miller_format": "--csv"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/aewshopping/history_books/refs/heads/main/data_csv/popular-history-books.csv",
+    "output_filename": "books.csv",
+    "columns_to_delete": ["tags", "tags_bespoke"],
+    "miller_format": "--csv"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/aewshopping/history_books/refs/heads/main/data_csv/tags.csv",
+    "output_filename": "tags.csv",
+    "columns_to_delete": [],
+    "miller_format": "--csv"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/aewshopping/history_books/refs/heads/main/data_tsv/quotes.tsv",
+    "output_filename": "quotes.tsv",
+    "columns_to_delete": [],
+    "miller_format": "--tsv"
+  }
+]
