@@ -72,28 +72,6 @@ jobs:
           echo "Downloaded $TEMP_INPUT_FILE head:"
           head "$TEMP_INPUT_FILE"
 
-          # Validate columns before processing
-#          ACTUAL_HEADERS_STRING=$(mlr ${MILLER_FORMAT_FLAGS} headers "$TEMP_INPUT_FILE")
-#          ACTUAL_HEADERS_LIST=$(echo "$ACTUAL_HEADERS_STRING" | tr ' ' '\n')
- #         MISSING_COLUMNS=()
-#
- #         if [ -n "${COLUMNS_TO_DELETE}" ]; then
-  #          IFS=',' read -r -a REQUESTED_COLUMNS_ARRAY <<< "${COLUMNS_TO_DELETE}"
-   #         for REQ_COL in "${REQUESTED_COLUMNS_ARRAY[@]}"; do
-  #            TRIMMED_REQ_COL=$(echo "$REQ_COL" | xargs)
-   #           if ! echo "$ACTUAL_HEADERS_LIST" | grep -qw "$TRIMMED_REQ_COL"; then
-   #             MISSING_COLUMNS+=("$TRIMMED_REQ_COL")
-    #          fi
-   #         done
-   #       fi
-
-   #       if [ ${#MISSING_COLUMNS[@]} -gt 0 ]; then
-   #         for M_COL in "${MISSING_COLUMNS[@]}"; do
-   #           echo "::warning file=${OUTPUT_FILENAME}::Column '${M_COL}' was specified for deletion but not found in the input file '${URL}'."
-   #         done
-   #         echo "WARNING: One or more specified columns were not found. Proceeding with deletion of existing columns."
-   #       fi
-
           # 2. Delete unwanted columns using Miller
           echo "Processing $TEMP_INPUT_FILE with Miller..."
           if [ -n "${COLUMNS_TO_DELETE}" ]; then
