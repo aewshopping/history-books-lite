@@ -29,13 +29,7 @@ jobs:
         echo "Installing jq..."
         sudo apt-get update && sudo apt-get install -y jq
         jq --version
-
-    - name: List files to debug
-      run: |
-        pwd # Print current working directory (should be repo root)
-        ls -F # List all files and directories in current dir
-        ls -F .github # List contents of .github to ensure it's correct
-        find . -name "config.json" # Search explicitly for the file
+      shell: bash
 
     - name: Process each file from config
       run: |
@@ -50,19 +44,81 @@ jobs:
         echo "Found $TOTAL_FILES files to process from $CONFIG_FILE."
 
         jq -c '.[]' "$CONFIG_FILE" | while IFS= read -r i; do
+          # Extract variables for the current file
           URL=$(echo "$i" | jq -r '.url')
           OUTPUT_FILENAME=$(echo "$i" | jq -r '.output_filename')
           COLUMNS_TO_DELETE_ARRAY=$(echo "$i" | jq -r '.columns_to_delete | @csv')
           COLUMNS_TO_DELETE=$(echo "${COLUMNS_TO_DELETE_ARRAY}" | sed 's/"//g') # Remove quotes from @csv output
           MILLER_FORMAT_FLAGS=$(echo "$i" | jq -r '.miller_format')
 
-          echo "Calling custom action for $OUTPUT_FILENAME..."
-          ./.github/actions/process-single-file/action.yml --file_url "$URL" \
-                                                          --output_filename "$OUTPUT_FILENAME" \
-                                                          --columns_to_delete "$COLUMNS_TO_DELETE" \
-                                                          --miller_format "$MILLER_FORMAT_FLAGS"
+          echo "--- Processing: $URL ---"
+          echo "Output filename: $OUTPUT_FILENAME"
+          echo "Columns to delete: [${COLUMNS_TO_DELETE}]"
+          echo "Miller format flags: ${MILLER_FORMAT_FLAGS}"
 
-        done # End of while loop
+          # --- Start of per-file processing logic (formerly in composite action) ---
+
+          # Create unique temporary file name
+          TEMP_INPUT_FILE=$(mktemp)
+          echo "Created temporary file: $TEMP_INPUT_FILE"
+
+          # Ensure the temporary file is removed even if the script fails
+          trap "rm -f \"$TEMP_INPUT_FILE\"" EXIT
+
+          # 1. Download the file
+          echo "Downloading $URL to $TEMP_INPUT_FILE..."
+          curl --output "$TEMP_INPUT_FILE" "$URL"
+
+          echo "Downloaded $TEMP_INPUT_FILE head:"
+          head "$TEMP_INPUT_FILE"
+
+          # Validate columns before processing
+          ACTUAL_HEADERS_STRING=$(mlr ${MILLER_FORMAT_FLAGS} headers "$TEMP_INPUT_FILE")
+          ACTUAL_HEADERS_LIST=$(echo "$ACTUAL_HEADERS_STRING" | tr ' ' '\n')
+          MISSING_COLUMNS=()
+
+          if [ -n "${COLUMNS_TO_DELETE}" ]; then
+            IFS=',' read -r -a REQUESTED_COLUMNS_ARRAY <<< "${COLUMNS_TO_DELETE}"
+            for REQ_COL in "${REQUESTED_COLUMNS_ARRAY[@]}"; do
+              TRIMMED_REQ_COL=$(echo "$REQ_COL" | xargs)
+              if ! echo "$ACTUAL_HEADERS_LIST" | grep -qw "$TRIMMED_REQ_COL"; then
+                MISSING_COLUMNS+=("$TRIMMED_REQ_COL")
+              fi
+            done
+          fi
+
+          if [ ${#MISSING_COLUMNS[@]} -gt 0 ]; then
+            for M_COL in "${MISSING_COLUMNS[@]}"; do
+              echo "::warning file=${OUTPUT_FILENAME}::Column '${M_COL}' was specified for deletion but not found in the input file '${URL}'."
+            done
+            echo "WARNING: One or more specified columns were not found. Proceeding with deletion of existing columns."
+          fi
+
+          # 2. Delete unwanted columns using Miller
+          echo "Processing $TEMP_INPUT_FILE with Miller..."
+          if [ -n "${COLUMNS_TO_DELETE}" ]; then
+            mlr ${MILLER_FORMAT_FLAGS} cut --exclude --fields "${COLUMNS_TO_DELETE}" "$TEMP_INPUT_FILE" > "${OUTPUT_FILENAME}"
+          else
+            echo "No columns specified for deletion. Copying original to output."
+            cp "$TEMP_INPUT_FILE" "${OUTPUT_FILENAME}"
+          fi
+
+          # Check for successful output file creation
+          if [ ! -f "${OUTPUT_FILENAME}" ]; then
+            echo "Error: Processed file '${OUTPUT_FILENAME}' was not created."
+            exit 1
+          fi
+          echo "Processed ${OUTPUT_FILENAME} head:"
+          head "${OUTPUT_FILENAME}"
+
+          # Temporary file cleanup handled by trap
+          echo "--- Finished processing ${OUTPUT_FILENAME} ---"
+          echo ""
+
+          # --- End of per-file processing logic ---
+
+        done # End of while loop for config items
+      shell: bash
 
     - name: Commit and push
       run: |-
