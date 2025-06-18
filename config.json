@@ -2,7 +2,7 @@
   {
     "url": "https://raw.githubusercontent.com/aewshopping/history_books/refs/heads/main/data_csv/books-tags.csv",
     "output_filename": "books-tags.csv",
-    "columns_to_delete": ["tag"],
+    "columns_to_delete": ["tag", "tag_id"],
     "miller_format": "--csv"
   },
   {
