@@ -33,7 +33,7 @@ jobs:
     - name: Process each file from config
       run: |
         set -eo pipefail
-        CONFIG_FILE="config.json"
+        CONFIG_FILE="/config.json"
         if [ ! -f "$CONFIG_FILE" ]; then
           echo "Error: Configuration file '$CONFIG_FILE' not found."
           exit 1
