@@ -3,30 +3,35 @@
     "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQOvFcmmZ6PRAKBRuyYElR7wsUrvZ0_gwvsQ8o074Z_mz2TvsspQM2Ma4AvKY2PUeqtCbf1nfK6tIc3/pub?gid=1202857970&single=true&output=csv",
     "output_filename": "data/books-tags.csv",
     "columns_to_delete": ["tag"],
+    "columns_to_select": [],
     "miller_format": "--csv"
   },
   {
     "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQOvFcmmZ6PRAKBRuyYElR7wsUrvZ0_gwvsQ8o074Z_mz2TvsspQM2Ma4AvKY2PUeqtCbf1nfK6tIc3/pub?gid=631722586&single=true&output=csv",
     "output_filename": "data/cats.csv",
     "columns_to_delete": ["cat_display_type"],
+    "columns_to_select": [],
     "miller_format": "--csv"
   },
   {
     "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQOvFcmmZ6PRAKBRuyYElR7wsUrvZ0_gwvsQ8o074Z_mz2TvsspQM2Ma4AvKY2PUeqtCbf1nfK6tIc3/pub?gid=1260956125&single=true&output=tsv",
     "output_filename": "data/books.tsv",
     "columns_to_delete": ["tags", "tags_bespoke"],
+    "columns_to_select": [],
     "miller_format": "--tsv"
   },
   {
     "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQOvFcmmZ6PRAKBRuyYElR7wsUrvZ0_gwvsQ8o074Z_mz2TvsspQM2Ma4AvKY2PUeqtCbf1nfK6tIc3/pub?gid=1565642384&single=true&output=csv",
     "output_filename": "data/tags.csv",
     "columns_to_delete": [],
+    "columns_to_select": ["pk_tag_id", "tag_text", "tag_emoji", "emoji_unicode", "tag_sort", "fk_cat_id"],
     "miller_format": "--csv"
   },
   {
     "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQOvFcmmZ6PRAKBRuyYElR7wsUrvZ0_gwvsQ8o074Z_mz2TvsspQM2Ma4AvKY2PUeqtCbf1nfK6tIc3/pub?gid=1667511423&single=true&output=tsv",
     "output_filename": "data/quotes.tsv",
     "columns_to_delete": [],
+    "columns_to_select": [],
     "miller_format": "--tsv"
   }
 ]
