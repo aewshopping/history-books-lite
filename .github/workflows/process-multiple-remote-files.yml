@@ -53,6 +53,8 @@ jobs:
           OUTPUT_FILENAME=$(echo "$i" | jq -r '.output_filename')
           COLUMNS_TO_DELETE_ARRAY=$(echo "$i" | jq -r '.columns_to_delete | @csv')
           COLUMNS_TO_DELETE=$(echo "${COLUMNS_TO_DELETE_ARRAY}" | sed 's/"//g') # Remove quotes from @csv output
+          COLUMNS_TO_SELECT_ARRAY=$(echo "$i" | jq -r '.columns_to_select | @csv')
+          COLUMNS_TO_SELECT=$(echo "${COLUMNS_TO_SELECT_ARRAY}" | sed 's/"//g') # Remove quotes from @csv output
           MILLER_FORMAT_FLAGS=$(echo "$i" | jq -r '.miller_format')
 
           echo "--- Processing: $URL ---"
@@ -79,11 +81,16 @@ jobs:
           # 2. Delete unwanted columns using Miller
           echo "Processing $TEMP_INPUT_FILE with Miller..."
           if [ -n "${COLUMNS_TO_DELETE}" ]; then
-            echo "mlr ${MILLER_FORMAT_FLAGS} cut -x -f ${COLUMNS_TO_DELETE} $TEMP_INPUT_FILE > ${OUTPUT_FILENAME}"
+            echo "Deleting these column ${COLUMNS_TO_DELETE}"
             mlr ${MILLER_FORMAT_FLAGS} cut -x -f "${COLUMNS_TO_DELETE}" "$TEMP_INPUT_FILE" > "${OUTPUT_FILENAME}"
           else
-            echo "No columns specified for deletion. Copying original to output."
-            cp "$TEMP_INPUT_FILE" "${OUTPUT_FILENAME}"
+            if [ -n "${COLUMNS_TO_SELECT}" ]; then
+              echo "Selecting only these column ${COLUMNS_TO_SELECT}"
+              mlr ${MILLER_FORMAT_FLAGS} cut -f "${COLUMNS_TO_SELECT}" "$TEMP_INPUT_FILE" > "${OUTPUT_FILENAME}"
+            else
+              echo "No columns specified for deletion and none for selection. Copying original to output."
+              cp "$TEMP_INPUT_FILE" "${OUTPUT_FILENAME}"
+            fi
           fi
 
           # Check for successful output file creation
