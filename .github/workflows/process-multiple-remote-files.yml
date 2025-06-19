@@ -1,4 +1,4 @@
-name: Process Multiple Remote Files with Miller (using Composite Action)
+name: Process Multiple Remote Files with Miller
 
 on:
   workflow_dispatch: # Allows manual triggering
