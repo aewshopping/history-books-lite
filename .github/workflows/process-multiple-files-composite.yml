@@ -3,6 +3,9 @@ name: Process Multiple Remote Files with Miller (using Composite Action)
 on:
   workflow_dispatch: # Allows manual triggering
 
+permissions:
+  contents: write
+
 jobs:
   process_all_files:
     runs-on: ubuntu-latest
@@ -43,8 +46,6 @@ jobs:
 
         TOTAL_FILES=$(jq '. | length' "$CONFIG_FILE")
         echo "Found $TOTAL_FILES files to process from $CONFIG_FILE."
-
-        GENERATED_FILES="" # Initialize a variable to store generated filenames
 
         jq -c '.[]' "$CONFIG_FILE" | while IFS= read -r i; do
           # Extract variables for the current file
@@ -93,19 +94,12 @@ jobs:
           echo "Processed ${OUTPUT_FILENAME} head:"
           head "${OUTPUT_FILENAME}"
 
-          # Add the generated output filename to our list
-          GENERATED_FILES+="${OUTPUT_FILENAME} "
-          echo "${OUTPUT_FILENAME}"
-          echo "${GENERATED_FILES}"
-
           # Temporary file cleanup handled by trap
           echo "--- Finished processing ${OUTPUT_FILENAME} ---"
           echo ""
 
         done # End of while loop for config items
 
-        # Set the generated_files as an output of this step
-        echo "generated_files=${GENERATED_FILES}" >> "$GITHUB_OUTPUT"
       shell: bash
 
     - name: Commit and push
