@@ -32,6 +32,7 @@ jobs:
       shell: bash
 
     - name: Process each file from config
+      id: process-files # Add an ID to this step to access its outputs
       run: |
         set -x
         set -eo pipefail
@@ -43,6 +44,8 @@ jobs:
 
         TOTAL_FILES=$(jq '. | length' "$CONFIG_FILE")
         echo "Found $TOTAL_FILES files to process from $CONFIG_FILE."
+
+        GENERATED_FILES="" # Initialize a variable to store generated filenames
 
         jq -c '.[]' "$CONFIG_FILE" | while IFS= read -r i; do
           # Extract variables for the current file
@@ -91,21 +94,37 @@ jobs:
           echo "Processed ${OUTPUT_FILENAME} head:"
           head "${OUTPUT_FILENAME}"
 
+          # Add the generated output filename to our list
+          GENERATED_FILES+="${OUTPUT_FILENAME} "
+
           # Temporary file cleanup handled by trap
           echo "--- Finished processing ${OUTPUT_FILENAME} ---"
           echo ""
 
-          # --- End of per-file processing logic ---
-
         done # End of while loop for config items
+
+        # Set the generated_files as an output of this step
+        echo "generated_files=${GENERATED_FILES}" >> "$GITHUB_OUTPUT"
       shell: bash
 
     - name: Commit and push
       run: |-
         git config user.name "Automated"
         git config user.email "actions@users.noreply.github.com"
-        git add --all
+        
+        # Get the list of generated files from the previous step's output
+        GENERATED_FILES="${{ steps.process-files.outputs.generated_files }}"
+        
+        # Check if there are any files to add
+        if [ -z "$GENERATED_FILES" ]; then
+          echo "No generated files to commit. Exiting."
+          exit 0
+        fi
+
+        echo "Adding generated files: $GENERATED_FILES"
+        git add $GENERATED_FILES # Add only the generated files
+        
         timestamp=$(date -u)
-        git commit -m "${timestamp}" || exit 0
+        git commit -m "Automated update of generated data: ${timestamp}" || exit 0
         git pull --rebase
         git push
