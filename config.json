@@ -13,7 +13,7 @@
   },
   {
     "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQOvFcmmZ6PRAKBRuyYElR7wsUrvZ0_gwvsQ8o074Z_mz2TvsspQM2Ma4AvKY2PUeqtCbf1nfK6tIc3/pub?gid=1260956125&single=true&output=tsv",
-    "output_filename": "data/books.csv",
+    "output_filename": "data/books.tsv",
     "columns_to_delete": ["tags", "tags_bespoke"],
     "miller_format": "--tsv"
   },
