@@ -34,7 +34,6 @@ jobs:
     - name: Process each file from config
       id: process-files # Add an ID to this step to access its outputs
       run: |
-        set -x
         set -eo pipefail
         CONFIG_FILE="config.json"
         if [ ! -f "$CONFIG_FILE" ]; then
@@ -96,6 +95,8 @@ jobs:
 
           # Add the generated output filename to our list
           GENERATED_FILES+="${OUTPUT_FILENAME} "
+          echo ${OUTPUT_FILENAME}
+          echo ${GENERATED_FILES}
 
           # Temporary file cleanup handled by trap
           echo "--- Finished processing ${OUTPUT_FILENAME} ---"
