@@ -1,30 +1,30 @@
 [
   {
-    "url": "https://raw.githubusercontent.com/aewshopping/history_books/refs/heads/main/data_csv/books-tags.csv",
+    "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQOvFcmmZ6PRAKBRuyYElR7wsUrvZ0_gwvsQ8o074Z_mz2TvsspQM2Ma4AvKY2PUeqtCbf1nfK6tIc3/pub?gid=1202857970&single=true&output=csv",
     "output_filename": "data/books-tags.csv",
     "columns_to_delete": ["tag"],
     "miller_format": "--csv"
   },
   {
-    "url": "https://raw.githubusercontent.com/aewshopping/history_books/refs/heads/main/data_csv/cats.csv",
+    "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQOvFcmmZ6PRAKBRuyYElR7wsUrvZ0_gwvsQ8o074Z_mz2TvsspQM2Ma4AvKY2PUeqtCbf1nfK6tIc3/pub?gid=631722586&single=true&output=csv",
     "output_filename": "data/cats.csv",
     "columns_to_delete": ["cat_display_type"],
     "miller_format": "--csv"
   },
   {
-    "url": "https://raw.githubusercontent.com/aewshopping/history_books/refs/heads/main/data_csv/popular-history-books.csv",
+    "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQOvFcmmZ6PRAKBRuyYElR7wsUrvZ0_gwvsQ8o074Z_mz2TvsspQM2Ma4AvKY2PUeqtCbf1nfK6tIc3/pub?gid=1260956125&single=true&output=tsv",
     "output_filename": "data/books.csv",
     "columns_to_delete": ["tags", "tags_bespoke"],
-    "miller_format": "--csv"
+    "miller_format": "--tsv"
   },
   {
-    "url": "https://raw.githubusercontent.com/aewshopping/history_books/refs/heads/main/data_csv/tags.csv",
+    "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQOvFcmmZ6PRAKBRuyYElR7wsUrvZ0_gwvsQ8o074Z_mz2TvsspQM2Ma4AvKY2PUeqtCbf1nfK6tIc3/pub?gid=1565642384&single=true&output=csv",
     "output_filename": "data/tags.csv",
     "columns_to_delete": [],
     "miller_format": "--csv"
   },
   {
-    "url": "https://raw.githubusercontent.com/aewshopping/history_books/refs/heads/main/data_tsv/quotes.tsv",
+    "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQOvFcmmZ6PRAKBRuyYElR7wsUrvZ0_gwvsQ8o074Z_mz2TvsspQM2Ma4AvKY2PUeqtCbf1nfK6tIc3/pub?gid=1667511423&single=true&output=tsv",
     "output_filename": "data/quotes.tsv",
     "columns_to_delete": [],
     "miller_format": "--tsv"
