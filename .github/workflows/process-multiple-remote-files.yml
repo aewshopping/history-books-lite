@@ -71,7 +71,7 @@ jobs:
 
           # 1. Download the file
           echo "Downloading $URL to $TEMP_INPUT_FILE..."
-          curl --output -L "$TEMP_INPUT_FILE" "$URL"
+          curl -L "$URL" > "$TEMP_INPUT_FILE"
 
           echo "Downloaded $TEMP_INPUT_FILE head:"
           head "$TEMP_INPUT_FILE"
