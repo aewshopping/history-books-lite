@@ -95,8 +95,8 @@ jobs:
 
           # Add the generated output filename to our list
           GENERATED_FILES+="${OUTPUT_FILENAME} "
-          echo ${OUTPUT_FILENAME}
-          echo ${GENERATED_FILES}
+          echo "${OUTPUT_FILENAME}"
+          echo "${GENERATED_FILES}"
 
           # Temporary file cleanup handled by trap
           echo "--- Finished processing ${OUTPUT_FILENAME} ---"
