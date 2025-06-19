@@ -112,20 +112,9 @@ jobs:
       run: |-
         git config user.name "Automated"
         git config user.email "actions@users.noreply.github.com"
-        
-        # Get the list of generated files from the previous step's output
-        GENERATED_FILES="${{ steps.process-files.outputs.generated_files }}"
-        
-        # Check if there are any files to add
-        if [ -z "$GENERATED_FILES" ]; then
-          echo "No generated files to commit. Exiting."
-          exit 0
-        fi
-
-        echo "Adding generated files: $GENERATED_FILES"
-        git add $GENERATED_FILES # Add only the generated files
-        
+        git add '*.csv'
+        git add '*.tsv'
         timestamp=$(date -u)
-        git commit -m "Automated update of generated data: ${timestamp}" || exit 0
+        git commit -m "${timestamp}" || exit 0
         git pull --rebase
         git push
