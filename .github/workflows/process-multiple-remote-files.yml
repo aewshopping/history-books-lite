@@ -81,11 +81,11 @@ jobs:
           # 2. Delete unwanted columns using Miller
           echo "Processing $TEMP_INPUT_FILE with Miller..."
           if [ -n "${COLUMNS_TO_DELETE}" ]; then
-            echo "Deleting these column ${COLUMNS_TO_DELETE}"
+            echo "[o] Deleting these columns: ${COLUMNS_TO_DELETE}"
             mlr ${MILLER_FORMAT_FLAGS} cut -x -f "${COLUMNS_TO_DELETE}" "$TEMP_INPUT_FILE" > "${OUTPUT_FILENAME}"
           else
             if [ -n "${COLUMNS_TO_SELECT}" ]; then
-              echo "Selecting only these column ${COLUMNS_TO_SELECT}"
+              echo "[x] Selecting only these columns: ${COLUMNS_TO_SELECT}"
               mlr ${MILLER_FORMAT_FLAGS} cut -f "${COLUMNS_TO_SELECT}" "$TEMP_INPUT_FILE" > "${OUTPUT_FILENAME}"
             else
               echo "No columns specified for deletion and none for selection. Copying original to output."
