@@ -24,7 +24,7 @@
     "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQOvFcmmZ6PRAKBRuyYElR7wsUrvZ0_gwvsQ8o074Z_mz2TvsspQM2Ma4AvKY2PUeqtCbf1nfK6tIc3/pub?gid=1565642384&single=true&output=csv",
     "output_filename": "data/tags.csv",
     "columns_to_delete": [],
-    "columns_to_select": [pk_tag_id, tag_text, tag_emoji, emoji_unicode, tag_sort, fk_cat_id],
+    "columns_to_select": ["pk_tag_id", "tag_text", "tag_emoji", "emoji_unicode", "tag_sort", "fk_cat_id"],
     "miller_format": "--csv"
   },
   {
