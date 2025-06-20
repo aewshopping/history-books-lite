@@ -1,83 +1,69 @@
-# Data Processing Repository
+# Automated Data Processing and Querying Pipeline
 
-## Repository Overview
+## What This Repository Does
 
-This repository is designed to automatically fetch, process, and store various data files from remote sources. It uses a GitHub Actions workflow to manage these tasks, with the processed files being saved into the `data/` directory.
+This repository automatically fetches data from various online sources, cleans it up, stores it in simple text files (CSV and TSV), builds a searchable database from this data, and then runs predefined queries to generate useful reports.
 
-## How it Works
+The whole process is managed by GitHub Actions, which are like automated scripts that run specific tasks.
 
-The core of this repository is a GitHub Actions workflow defined in `.github/workflows/process-multiple-remote-files.yml`, which is configured through the `config.json` file.
+## How It Works: The Automated Workflows
 
-### GitHub Actions Workflow (`.github/workflows/process-multiple-remote-files.yml`)
+There are three main automated workflows (GitHub Actions) you can run:
 
-The workflow performs the following steps:
+1.  **Fetch and Clean Raw Data (`process-multiple-remote-files.yml`)**
+    *   **What it does:** This workflow downloads data from URLs listed in the `config.json` file.
+    *   **Configuration (`config.json`):** This file tells the workflow where to get each data file, what to name the output file (e.g., `data/books.csv`), and if any specific columns of data should be removed or kept.
+    *   **Processing:** It uses a tool called "Miller" to clean up the downloaded files (like removing unnecessary columns).
+    *   **Output:** The cleaned data is saved as CSV (comma-separated values) or TSV (tab-separated values) files in the `data/` directory.
+    *   **Committing:** Changes to these data files are automatically saved back to the repository.
 
-1.  **Manual Trigger:** The workflow is initiated manually through the GitHub Actions tab in the repository (`on: workflow_dispatch`).
-2.  **Checkout Repository:** It first checks out the current state of the repository.
-3.  **Install Dependencies:**
-    *   **Miller:** A powerful command-line tool for querying, shaping, and processing structured data formats like CSV, TSV, and JSON.
-    *   **jq:** A lightweight and flexible command-line JSON processor, used here to parse the `config.json` file.
-4.  **Process Files from `config.json`:** This is the main operational step. The workflow reads `config.json` and iterates through each entry defined within it.
-    *   For each entry, it extracts details such as the file URL, desired output filename, columns to be deleted, and the file format.
-    *   **Per-File Operations:**
-        1.  **Download:** The remote file is downloaded from the specified `url` to a temporary location.
-        2.  **Process with Miller:** Miller (`mlr`) is used to process the downloaded file. The primary operation performed is deleting specified columns (defined in `columns_to_delete`). If no columns are specified for deletion, the original file is copied as is. The `miller_format` flag (e.g., `--csv`, `--tsv`) ensures correct handling of the file type.
-        3.  **Save Output:** The processed data is saved to the `data/` directory with the specified `output_filename`.
-5.  **Commit and Push Changes:**
-    *   After all files in `config.json` have been processed, the workflow stages all new or modified `*.csv` and `*.tsv` files (primarily those in the `data/` directory).
-    *   It then commits these changes with a timestamp as the commit message.
-    *   Finally, it pulls the latest changes from the remote repository (with rebase) and pushes the new commit.
+2.  **Build the Database (`build-commit-sqlite-db.yml`)**
+    *   **What it does:** This workflow takes all the clean CSV and TSV files from the `data/` directory and uses them to build (or update) a SQLite database file called `data.db`.
+    *   **How it works:** It runs a script (`build-db.sh`) which uses "sqlite-utils" (a tool for working with SQLite databases) to:
+        *   Create tables in the database for each data file.
+        *   Make sure data is stored in the correct format (e.g., numbers as numbers, dates as dates).
+        *   Set up full-text search for some data, making it easier to find things.
+    *   **Output:** The main output is the `data.db` file.
+    *   **Committing:** The updated `data.db` is automatically saved back to the repository.
 
-### Configuration File (`config.json`)
+3.  **Run SQL Queries (`run-sql-queries.yml`)**
+    *   **What it does:** This workflow runs specific questions (written in SQL, the language for databases) against the `data.db` database.
+    *   **SQL Queries:** The SQL questions are stored in files within the `sql-query/` directory (e.g., `latest100.sql` to get the 100 newest books).
+    *   **Output:** The answers (results) from these queries are saved as JSON files (a common data format) in the `sql-query/result/` directory (e.g., `sql-query/result/latest100.json`).
+    *   **Committing:** These JSON result files are automatically saved back to the repository.
 
-The `config.json` file is a JSON array that acts as a manifest, defining each file to be fetched and processed. Each object in the array represents one file and has the following structure:
+## Key Files and Directories
 
-*   `url` (string): The direct URL to the raw remote data file.
-*   `output_filename` (string): The desired path and filename for the processed file, which will be stored in the `data/` directory (e.g., `data/books.csv`).
-*   `columns_to_delete` (array of strings): A list of column names that should be removed from the data file. If no columns need to be deleted, this should be an empty array `[]`.
-*   `miller_format` (string): A flag indicating the format of the file for Miller processing (e.g., `"--csv"` for CSV files, `"--tsv"` for TSV files).
+*   **`.github/workflows/`**: Contains the YAML files that define the GitHub Actions workflows.
+*   **`config.json`**: Configuration for the "Fetch and Clean Raw Data" workflow. Edit this file to change data sources or how they are initially processed.
+*   **`data/`**: Stores the cleaned CSV and TSV data files. These are the input for the database.
+*   **`data.db`**: The SQLite database file. This is created and updated by the "Build the Database" workflow.
+*   **`build-db.sh`**: The shell script that details the steps for building `data.db`.
+*   **`sql-query/`**: Contains the SQL query files.
+*   **`sql-query/result/`**: Stores the JSON output from the "Run SQL Queries" workflow.
+*   **`requirements.txt`**: Lists necessary Python tools (like `sqlite-utils`).
 
-**Example Entry:**
+## Typical Order of Operations
 
-```json
-{
-  "url": "https://raw.githubusercontent.com/aewshopping/history_books/refs/heads/main/data_csv/popular-history-books.csv",
-  "output_filename": "data/books.csv",
-  "columns_to_delete": ["tags", "tags_bespoke"],
-  "miller_format": "--csv"
-}
-```
+While you can run these workflows independently, the typical order would be:
 
-In this example:
-*   The workflow will download `popular-history-books.csv` from the specified URL.
-*   It will remove the "tags" and "tags_bespoke" columns.
-*   The resulting CSV file will be saved as `data/books.csv`.
+1.  Run **Fetch and Clean Raw Data** to get the latest data into the `data/` directory.
+2.  Run **Build the Database** to update `data.db` with the new data.
+3.  Run **Run SQL Queries** to generate new reports based on the updated database.
 
-### The `data/` Directory
+## How to Run the Workflows
 
-*   This directory contains the final output of the GitHub Actions workflow.
-*   **Important:** The files in this directory are automatically generated and updated by the workflow. Any manual changes made directly to files within the `data/` directory are likely to be overwritten the next time the workflow runs.
+1.  Go to the "Actions" tab of this repository on GitHub.
+2.  In the left sidebar, you'll see the names of the workflows (e.g., "Fetch and Clean Raw Data").
+3.  Click on the workflow you want to run.
+4.  You'll see a "Run workflow" button or dropdown on the right. Click it and then confirm to start the workflow.
 
-## Key Technologies
+## Main Technologies Used
 
-*   **GitHub Actions:** For orchestrating the automated fetching, processing, and committing of data.
-*   **Miller:** For command-line data manipulation of structured text files.
-*   **jq:** For parsing the `config.json` file within the shell script environment of the workflow.
+*   **GitHub Actions:** For automation.
+*   **Miller:** For processing CSV/TSV files.
+*   **sqlite-utils:** For creating and managing the SQLite database.
+*   **jq:** For handling JSON data in the workflows.
+*   **SQLite:** The database system used.
 
-## How to Use/Run
-
-1.  **Triggering the Workflow:**
-    *   Navigate to the "Actions" tab of this repository on GitHub.
-    *   Under "Workflows", find "Process Multiple Remote Files with Miller".
-    *   Click the "Run workflow" button. This will manually trigger the workflow.
-
-2.  **Modifying Processing Logic:**
-    *   **To add a new file, remove a file, or change which columns are deleted for an existing file:** Edit the `config.json` file.
-        *   Add a new JSON object to the array for a new file.
-        *   Remove an existing JSON object to stop processing a file.
-        *   Modify the `url`, `output_filename`, `columns_to_delete`, or `miller_format` fields for an existing file as needed.
-    *   Commit and push your changes to `config.json` to the main branch. The next time the workflow runs, it will use the updated configuration.
-
-## Note on `data/` Directory
-
-As mentioned previously, the `data/` directory is strictly for output files generated by the automated workflow. Please do not commit files directly to this directory, as they will be overwritten. All data processing should be managed by updating `config.json` and letting the GitHub Action handle the file generation.
+This README aims to provide a clear and simple guide to how this repository works.
