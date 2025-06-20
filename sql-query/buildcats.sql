@@ -1,6 +1,8 @@
 --build the categories info incl book count. Can limit to certain no of books if required, currently unlimited at 6000
 --still has a problem with shape and funny quotes going on, need to fix this
 --on command line: sqlite3 data.db < sql-query/buildcats.sql > sql-query/result/buildcats.json
+--or to output valid json rather than escaped json within the arrays:
+--sqlite3 data.db < sql-query/buildcats.sql | jq '.[] |= (.tag_emoji |= fromjson | .tag_name |= fromjson | .emoji_unicode |= fromjson | .tag_count |= fromjson)' > sql-query/result/buildcats.json
 .mode json
 with books_all as (
 -- get XXX most recent books but make all reviewed and prize books included 
