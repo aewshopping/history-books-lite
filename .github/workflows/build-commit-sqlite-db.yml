@@ -22,14 +22,13 @@ jobs:
         pip install -r requirements.txt
     - name: Build SQLite database
       run: |
-        DB_FILE="data.db"
-        rm -f "$DB_FILE"
+        rm -f data.db
         bash ./build-db.sh
     - name: Commit and push
       run: |-
         git config user.name "Automated"
         git config user.email "actions@users.noreply.github.com"
-        git add "$DB_FILE"
+        git add data.db
         timestamp=$(date -u)
         git commit -m "${timestamp}" || exit 0
         git pull --rebase
