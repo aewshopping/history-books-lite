@@ -7,3 +7,4 @@ sqlite-utils transform ./data.db tags --type tag_sort INTEGER
 sqlite-utils transform ./data.db cats --type cat_sort INTEGER
 sqlite-utils transform ./data.db books --type pages INTEGER
 sqlite-utils convert ./data.db books hb_publish_date 'r.parsedate(value, dayfirst=True)'
+sqlite-utils enable-fts ./data.db books title author publisher --fts4 --tokenize porter
