@@ -1,4 +1,4 @@
-name: run sql queries
+name: Run sql queries
 
 on:
   workflow_dispatch: # Allows manual triggering
@@ -25,11 +25,11 @@ jobs:
 
     - name: run sql queries from files
       run: |
-        echo "Running buildcats.sql"
+        echo "Running buildcats.sql with jq fromjson for escaped json string inside arrays"
         sqlite3 data.db < sql-query/buildcats.sql | jq '.[] |= with_entries(.value |= (fromjson? // .))' > sql-query/result/buildcats.json
 
         echo "Running latest100.sql"
-        sqlite3 data.db < sql-query/latest100.sql | jq '.[] |= with_entries(.value |= (fromjson? // .))' > sql-query/result/latest100.json
+        sqlite3 data.db < sql-query/latest100.sql > sql-query/result/latest100.json
 
     - name: Commit and push
       run: |-
