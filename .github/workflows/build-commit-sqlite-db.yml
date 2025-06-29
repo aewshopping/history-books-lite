@@ -1,4 +1,4 @@
-name: Build and commit sqlite db
+name: Build and commit sqlite db # THIS HAS BEEN SUPERSEDED BY AN ACTION WHICH COMMITS FILES TO A DATA-OUTPUT BRANCH WHICH CAN BE ORPHANED AT WILL THUS AVOIDING BINARY FILE REPO BLOAT
 
 on:
   workflow_dispatch:
