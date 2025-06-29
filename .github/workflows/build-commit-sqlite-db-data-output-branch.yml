@@ -1,4 +1,4 @@
-name: data-output branch - build and commit sqlite db
+name: data-output branch - build and commit sqlite db # THIS ACTION REQUIRES BRANCH DATA-OUTPUT TO EXISTING ALREADY. CAN BE CREATED WITH CREATE ORPHAN BRANCH ACTION
 
 on:
   workflow_dispatch:
