@@ -1,0 +1,65 @@
+name: data-output branch - build and commit sqlite db
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy-test:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write 
+    
+    steps:
+    - name: Checkout main branch
+      uses: actions/checkout@v4
+      with:
+        ref: main
+        path: main-branch
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+        cache: "pip"
+        
+    - name: Install dependencies
+      run: |
+        pip install -r main-branch/requirements.txt
+        
+    - name: Build SQLite database
+      run: |
+        cd main-branch
+        rm -f data.db
+        bash ./build-db.sh
+
+    - name: Checkout data output branch
+      uses: actions/checkout@v4
+      with:
+        ref: data-output
+        path: data-output-branch
+
+    - name: Delete old SQlite database
+      run: |
+        cd data-output-branch
+        rm -f data.db
+        cp ../main-branch/data.db . # Copy to current directory (data-output-branch)
+        
+    - name: Commit and push
+      run: |-
+        cd data-output-branch
+        git config user.name "Automated"
+        git config user.email "actions@users.noreply.github.com"
+        git add data.db
+        timestamp=$(date -u)
+        git commit -m "${timestamp}" || exit 0
+
+        if git ls-remote --exit-code --heads origin data-output; then
+          # Remote branch exists, so pull and rebase
+          git pull --rebase origin data-output
+          echo "Rebased local changes onto remote 'data-output'."
+        else
+          echo "Remote 'data-output' branch does not exist. Pushing as new branch."
+        fi
+
+        git push origin HEAD:data-output
