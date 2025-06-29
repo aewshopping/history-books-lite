@@ -53,13 +53,5 @@ jobs:
         git add data.db
         timestamp=$(date -u)
         git commit -m "${timestamp}" || exit 0
-
-        if git ls-remote --exit-code --heads origin data-output; then
-          # Remote branch exists, so pull and rebase
-          git pull --rebase origin data-output
-          echo "Rebased local changes onto remote 'data-output'."
-        else
-          echo "Remote 'data-output' branch does not exist. Pushing as new branch."
-        fi
-
+        git pull --rebase origin data-output
         git push origin HEAD:data-output
