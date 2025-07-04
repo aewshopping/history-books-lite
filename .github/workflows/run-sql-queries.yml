@@ -1,4 +1,5 @@
-name: Run sql queries # note must run AFTER data.db is created on data-output branch!
+name: Run sql queries
+# note must run AFTER data.db is created on data-output branch!
 
 on:
   workflow_dispatch: # Allows manual triggering
