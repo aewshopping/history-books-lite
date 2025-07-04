@@ -32,15 +32,15 @@ jobs:
         jq --version
       shell: bash
 
-     - name: run sql queries from files
+    - name: run sql queries from files
       run: |
         echo "Running buildcats.sql with jq fromjson for escaped json string inside arrays"
         # Explicitly reference data.db in the current working directory as we don't have a path to data-output so can use ./
         # noting that the jq stuff is to json stringify stuff within arrays which otherwise gets returned as a weird string with lots of double quotes
-        sqlite3 ./data.db < main-branch-files/sql-query/buildcats.sql | jq '.[] |= with_entries(.value |= (fromjson? // .))' > sql-query/result/buildcats.json
+        sqlite3 ./data.db < main-branch/sql-query/buildcats.sql | jq '.[] |= with_entries(.value |= (fromjson? // .))' > sql-query/result/buildcats.json
 
         echo "Running latest100.sql"
-        sqlite3 ./data.db < main-branch-files/sql-query/latest100.sql > sql-query/result/latest100.json
+        sqlite3 ./data.db < main-branch/sql-query/latest100.sql > sql-query/result/latest100.json
 
     - name: Commit and push
       run: |-
@@ -48,6 +48,6 @@ jobs:
         git config user.email "actions@users.noreply.github.com"
         git add sql-query/result/*.json # Only add the result JSON files
         timestamp=$(date -u)
-        git commit -m ${timestamp}" || exit 0
+        git commit -m "${timestamp}" || exit 0
         git pull --rebase origin data-output # Rebase against data-output
         git push origin data-output # Push back to the data-output branch
