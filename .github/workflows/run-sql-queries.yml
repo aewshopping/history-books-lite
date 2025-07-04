@@ -34,6 +34,9 @@ jobs:
 
     - name: run sql queries from files
       run: |
+        # Create the result directory if it doesn't exist
+        mkdir -p sql-query/result
+
         echo "Running buildcats.sql with jq fromjson for escaped json string inside arrays"
         # Explicitly reference data.db in the current working directory as we don't have a path to data-output so can use ./
         # noting that the jq stuff is to json stringify stuff within arrays which otherwise gets returned as a weird string with lots of double quotes
