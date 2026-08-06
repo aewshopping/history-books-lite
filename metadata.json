@@ -3,9 +3,7 @@
     "datasette-auth-tokens": {
       "tokens": [
         {
-          "token": {
-            "$env": "DATASETTE_AUTH_TOKEN"
-          },
+          "token": "password1",
           "actor": {
             "id": "token-user"
           }
