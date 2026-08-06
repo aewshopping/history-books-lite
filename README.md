@@ -97,23 +97,31 @@ This README aims to provide a clear and comprehensive guide to understanding and
 
 ## Running Datasette in GitHub Codespaces
 
-You can browse `data.db` locally with [Datasette](https://datasette.io/), protected by a required secret token (via the [datasette-auth-tokens](https://datasette.io/plugins/datasette-auth-tokens) plugin). Run these commands in the Codespaces terminal, from the repo root:
+You can browse `data.db` locally with [Datasette](https://datasette.io/), protected by a required secret token (via the [datasette-auth-tokens](https://datasette.io/plugins/datasette-auth-tokens) plugin). Datasette is installed with [pipx](https://pipx.pypa.io/) rather than plain `pip`: pipx installs it into its own isolated environment and — unlike a bare `pip install`, which can leave the command unreachable if `~/.local/bin` isn't already on your `$PATH` — automatically makes the `datasette` command available in your terminal. Run these commands in the Codespaces terminal, from the repo root:
 
 ```bash
-# 1. Install dependencies (datasette, datasette-auth-tokens, datasette-codespaces)
+# 1. Install sqlite-utils (needed to build the database)
 pip install -r requirements.txt
 
-# 2. Build the database from the data/ files
+# 2. Install Datasette as a standalone CLI tool via pipx
+pipx install datasette
+
+# 3. Add the auth-tokens and codespaces plugins into Datasette's pipx environment
+pipx inject datasette datasette-auth-tokens datasette-codespaces
+
+# 4. Build the database from the data/ files
 bash build-db.sh
 
-# 3. Set the secret token — pick your own value
+# 5. Set the secret token — pick your own value
 export DATASETTE_AUTH_TOKEN="choose-a-secret-value"
 
-# 4. Launch Datasette with the auth-tokens config
+# 6. Launch Datasette with the auth-tokens config
 datasette data.db -m metadata.json
 ```
 
-Codespaces will prompt you to forward port 8001 (the default Datasette port) — the `datasette-codespaces` plugin makes Datasette generate correct links for that forwarded URL automatically.
+If `pipx` isn't available yet, install it first with `pip install --user pipx && pipx ensurepath`, then open a new terminal (or `source ~/.bashrc`) before continuing. If `pipx install datasette` complains about needing a newer `uv`, rerun it as `pipx install --backend pip datasette`.
+
+Codespaces will prompt you to forward port 8001 (the default Datasette port) — the `datasette-codespaces` plugin (injected in step 3) makes Datasette generate correct links for that forwarded URL automatically.
 
 Because `metadata.json` sets `"allow": {"id": "token-user"}`, **every request requires the token** — there is no anonymous access. Append it to the forwarded URL as a query parameter:
 
