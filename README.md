@@ -97,7 +97,7 @@ This README aims to provide a clear and comprehensive guide to understanding and
 
 ## Running Datasette in GitHub Codespaces
 
-You can browse `data.db` locally with [Datasette](https://datasette.io/), protected by a required secret token (via the [datasette-auth-tokens](https://datasette.io/plugins/datasette-auth-tokens) plugin). Datasette is installed with [pipx](https://pipx.pypa.io/) rather than plain `pip`: pipx installs it into its own isolated environment and — unlike a bare `pip install`, which can leave the command unreachable if `~/.local/bin` isn't already on your `$PATH` — automatically makes the `datasette` command available in your terminal. Run these commands in the Codespaces terminal, from the repo root:
+You can browse `data.db` locally with [Datasette](https://datasette.io/). Anonymous visitors can browse tables, rows, filters, and search freely — but running raw/arbitrary SQL (the `?sql=` query parameter and the "Custom SQL query" box) requires a secret token, via the [datasette-auth-tokens](https://datasette.io/plugins/datasette-auth-tokens) plugin. This stops scraping via crafted SQL while keeping the normal browsing UI open to real users. Datasette is installed with [pipx](https://pipx.pypa.io/) rather than plain `pip`: pipx installs it into its own isolated environment and — unlike a bare `pip install`, which can leave the command unreachable if `~/.local/bin` isn't already on your `$PATH` — automatically makes the `datasette` command available in your terminal. Run these commands in the Codespaces terminal, from the repo root:
 
 ```bash
 # 1. Install sqlite-utils (needed to build the database)
@@ -112,10 +112,7 @@ pipx inject datasette datasette-auth-tokens datasette-codespaces
 # 4. Build the database from the data/ files
 bash build-db.sh
 
-# 5. Set the secret token — pick your own value
-export DATASETTE_AUTH_TOKEN="choose-a-secret-value"
-
-# 6. Launch Datasette with the auth-tokens config
+# 5. Launch Datasette with the auth-tokens config
 datasette data.db -m metadata.json
 ```
 
@@ -123,10 +120,10 @@ If `pipx` isn't available yet, install it first with `pip install --user pipx &&
 
 Codespaces will prompt you to forward port 8001 (the default Datasette port) — the `datasette-codespaces` plugin (injected in step 3) makes Datasette generate correct links for that forwarded URL automatically.
 
-Because `metadata.json` sets `"allow": {"id": "token-user"}`, **every request requires the token** — there is no anonymous access. Append it to the forwarded URL as a query parameter:
+`metadata.json` currently has a **hardcoded test token** (`password1`) rather than reading one from an environment variable — fine for throwaway testing, but replace it with a real random value (or switch back to `{"$env": "DATASETTE_AUTH_TOKEN"}`) before this is anything but disposable, since a committed token is visible in git history. `metadata.json`'s `"allow_sql"` block restricts SQL execution to whichever actor holds that token; browsing (`view-instance`/`view-database`/`view-table`) is left open by default so anonymous humans don't need it at all. To run SQL yourself, append the token to the forwarded URL as a query parameter:
 
 ```
-https://<your-forwarded-codespaces-url>/data.db?_auth_token=choose-a-secret-value
+https://<your-forwarded-codespaces-url>/data.json?sql=select+*+from+books+limit+1&_auth_token=password1
 ```
 
-(matching whatever value you exported as `DATASETTE_AUTH_TOKEN`). The token can also be sent as an `Authorization: Bearer choose-a-secret-value` header if you prefer not to put it in the URL. No real secret is committed to this repo — `metadata.json` only references the `DATASETTE_AUTH_TOKEN` environment variable, which you set yourself each session.
+The token can also be sent as an `Authorization: Bearer password1` header if you prefer not to put it in the URL.

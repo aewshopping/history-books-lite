@@ -12,7 +12,7 @@
       "param": "_auth_token"
     }
   },
-  "allow": {
+  "allow_sql": {
     "id": "token-user"
   }
 }
