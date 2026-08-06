@@ -1,0 +1,20 @@
+{
+  "plugins": {
+    "datasette-auth-tokens": {
+      "tokens": [
+        {
+          "token": {
+            "$env": "DATASETTE_AUTH_TOKEN"
+          },
+          "actor": {
+            "id": "token-user"
+          }
+        }
+      ],
+      "param": "_auth_token"
+    }
+  },
+  "allow": {
+    "id": "token-user"
+  }
+}

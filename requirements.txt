@@ -1,1 +1,4 @@
 sqlite-utils
+datasette
+datasette-auth-tokens
+datasette-codespaces

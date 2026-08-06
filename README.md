@@ -94,3 +94,31 @@ You can monitor the progress of the workflow in the Actions tab. To access the o
 *   **SQLite:** The file-based database system used.
 
 This README aims to provide a clear and comprehensive guide to understanding and operating this data processing pipeline.
+
+## Running Datasette in GitHub Codespaces
+
+You can browse `data.db` locally with [Datasette](https://datasette.io/), protected by a required secret token (via the [datasette-auth-tokens](https://datasette.io/plugins/datasette-auth-tokens) plugin). Run these commands in the Codespaces terminal, from the repo root:
+
+```bash
+# 1. Install dependencies (datasette, datasette-auth-tokens, datasette-codespaces)
+pip install -r requirements.txt
+
+# 2. Build the database from the data/ files
+bash build-db.sh
+
+# 3. Set the secret token — pick your own value
+export DATASETTE_AUTH_TOKEN="choose-a-secret-value"
+
+# 4. Launch Datasette with the auth-tokens config
+datasette data.db -m metadata.json
+```
+
+Codespaces will prompt you to forward port 8001 (the default Datasette port) — the `datasette-codespaces` plugin makes Datasette generate correct links for that forwarded URL automatically.
+
+Because `metadata.json` sets `"allow": {"id": "token-user"}`, **every request requires the token** — there is no anonymous access. Append it to the forwarded URL as a query parameter:
+
+```
+https://<your-forwarded-codespaces-url>/data.db?_auth_token=choose-a-secret-value
+```
+
+(matching whatever value you exported as `DATASETTE_AUTH_TOKEN`). The token can also be sent as an `Authorization: Bearer choose-a-secret-value` header if you prefer not to put it in the URL. No real secret is committed to this repo — `metadata.json` only references the `DATASETTE_AUTH_TOKEN` environment variable, which you set yourself each session.
