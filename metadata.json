@@ -12,6 +12,7 @@
       "param": "_auth_token"
     },
     "datasette-ip-rate-limit": {
+      "header": "X-Forwarded-For",
       "max_keys": 10000,
       "exempt_paths": [
         "/-/static/*"
