@@ -106,8 +106,8 @@ pip install -r requirements.txt
 # 2. Install Datasette as a standalone CLI tool via pipx
 pipx install datasette
 
-# 3. Add the auth-tokens and codespaces plugins into Datasette's pipx environment
-pipx inject datasette datasette-auth-tokens datasette-codespaces
+# 3. Add the auth-tokens, codespaces, and rate-limit plugins into Datasette's pipx environment
+pipx inject datasette datasette-auth-tokens datasette-codespaces datasette-ip-rate-limit
 
 # 4. Build the database from the data/ files
 bash build-db.sh
@@ -127,3 +127,7 @@ https://<your-forwarded-codespaces-url>/data.json?sql=select+*+from+books+limit+
 ```
 
 The token can also be sent as an `Authorization: Bearer password1` header if you prefer not to put it in the URL.
+
+`metadata.json` also configures [datasette-ip-rate-limit](https://github.com/datasette/datasette-ip-rate-limit) to throttle aggressive per-IP request volume (e.g. a bot hammering the site), independent of the SQL/token gating above — it applies to everyone, token or not. The default rule caps each IP at 120 requests per 60-second window, blocking it for 5 minutes if exceeded; static assets (`/-/static/*`) are exempt so the UI doesn't break for a blocked visitor. Verified locally (with a temporarily lowered limit): the 6th request within the window got a `429 Too Many Requests`.
+
+It deliberately does **not** set the plugin's `header` option (e.g. to `X-Forwarded-For`) to read the client IP through a proxy. Testing locally showed that if `header` is set but the named header isn't actually present on a request, the plugin **silently stops rate-limiting entirely** rather than falling back — worse than doing nothing. Leaving `header` unset uses the real ASGI connection address, which is known to correctly trigger 429s. The tradeoff: if Codespaces' port-forwarding proxy fans requests through one internal address, all visitors could be lumped into a single rate-limit bucket — a real but far safer failure mode than protection silently vanishing. If you want to try enabling `header` for finer-grained limiting, verify it's actually working first with the plugin's `debug: true` option (exposes `/-/ip-rate-limit-debug`) rather than assuming it's active. Adjust `window_seconds`/`max_requests`/`block_seconds` in `metadata.json` if these defaults are too strict or too loose for real usage.

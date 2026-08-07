@@ -10,6 +10,23 @@
         }
       ],
       "param": "_auth_token"
+    },
+    "datasette-ip-rate-limit": {
+      "max_keys": 10000,
+      "exempt_paths": [
+        "/-/static/*"
+      ],
+      "rules": [
+        {
+          "name": "global",
+          "paths": [
+            "/*"
+          ],
+          "window_seconds": 60,
+          "max_requests": 120,
+          "block_seconds": 300
+        }
+      ]
     }
   },
   "allow_sql": {
