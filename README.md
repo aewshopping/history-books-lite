@@ -106,8 +106,8 @@ pip install -r requirements.txt
 # 2. Install Datasette as a standalone CLI tool via pipx
 pipx install datasette
 
-# 3. Add the auth-tokens, codespaces, and rate-limit plugins into Datasette's pipx environment
-pipx inject datasette datasette-auth-tokens datasette-codespaces datasette-ip-rate-limit
+# 3. Add the Datasette plugins listed in datasette-plugins.txt into Datasette's pipx environment
+pipx inject datasette -r datasette-plugins.txt
 
 # 4. Build the database from the data/ files
 bash build-db.sh
@@ -117,6 +117,8 @@ datasette data.db -m metadata.json
 ```
 
 If `pipx` isn't available yet, install it first with `pip install --user pipx && pipx ensurepath`, then open a new terminal (or `source ~/.bashrc`) before continuing. If `pipx install datasette` complains about needing a newer `uv`, rerun it as `pipx install --backend pip datasette`.
+
+`datasette-plugins.txt` lists the Datasette plugins to install, one per line — like `requirements.txt`, but for `pipx inject` instead of `pip install` (it isn't read by plain `pip`, only by the `pipx inject -r` command above). Add a new plugin by adding a line to that file, then rerunning step 3.
 
 Codespaces will prompt you to forward port 8001 (the default Datasette port) — the `datasette-codespaces` plugin (injected in step 3) makes Datasette generate correct links for that forwarded URL automatically.
 
